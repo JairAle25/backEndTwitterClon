@@ -1,0 +1,22 @@
+{
+  "name": "backend-twitter-proyect",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "backend del clon de twitter",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "author": "Jair Cornejo",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "env-var": "^7.5.0",
+    "express": "^4.19.2",
+    "mysql2": "^3.10.2"
+  }
+}
