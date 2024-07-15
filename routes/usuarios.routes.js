@@ -12,5 +12,6 @@ export default class UsuariosRoutes extends Routes{
     getRoutes=()=>{
         this.router
             .get("/",this.usuariosC.getAllUsers)
+            .post("/register",this.usuariosC.createUser)
     }
 }
