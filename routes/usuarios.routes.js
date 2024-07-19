@@ -1,5 +1,6 @@
 import Routes from "./routes.js";
 import UsuariosController from "../controllers/usuarios.controllers.js";
+import { authenticateToken } from "../auth/usuarioAuth.js";
 
 export default class UsuariosRoutes extends Routes{
 
@@ -12,6 +13,8 @@ export default class UsuariosRoutes extends Routes{
     getRoutes=()=>{
         this.router
             .get("/",this.usuariosC.getAllUsers)
+            .get("/myUser",authenticateToken,this.usuariosC.getMyUserData)
             .post("/register",this.usuariosC.createUser)
+            .post("/login",this.usuariosC.login)
     }
 }
