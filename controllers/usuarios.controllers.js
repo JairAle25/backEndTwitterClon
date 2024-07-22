@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { pool } from "../database/conneccionMySql.js";
 import jwt from 'jsonwebtoken'
+import { error } from 'console';
 
 export default class UsuariosController{
 
@@ -31,8 +32,31 @@ export default class UsuariosController{
             const [result] = await pool.query('insert into usuarios (idUsuario,nombre,nombreUsuario,correoElectronico ,contrasenia) values (?,?,?,?,?);',
                 [idUser, nombre,nombreUsuario,correo, hashedPassword])
 
-            ///SI HAY UNA FILA INGRESADA ESTA CORRECTO
-            if (result.affectedRows > 0) res.status(200).json({ mensaje: 'Usuario registrado con éxito.' })
+            ///SI HAY UNA FILA INGRESADA ESTA CORRECTO Y CREO LA COOKIE CON EL TOKEN
+            if (result.affectedRows > 0){
+              const [result] = await pool.query("SELECT * FROM usuarios WHERE idUsuario = ?",[idUser]);
+              const user = result[0]
+              const {nombre,biografia,fechaDeIngreso,ubicacion,sitioWeb,fotoPerfil,fotoBanner,correoElectronico,nombreUsuario,verificado} = user;
+
+              const token = jwt.sign({
+                nombre,
+                biografia,
+                fechaDeIngreso,
+                ubicacion,
+                sitioWeb,
+                fotoPerfil,
+                fotoBanner,
+                correoElectronico,
+                nombreUsuario,
+                verificado
+              },process.env.KEY_JWT,
+              { 
+                  expiresIn: '1h' 
+              })
+
+              res.cookie('access_token', token, { httpOnly: true, sameSite: 'Lax' });
+              res.status(200).json({ mensaje: 'Usuario registrado con éxito.' })
+            } 
             else res.status(404).json({ error: 'Error al intentar registrar el usuario, reintente mas tarde.' })
         } catch (error) {
             res.status(500).json({ error: 'Error al intentar registrar el usuario, reintente mas tarde.' })
@@ -80,6 +104,22 @@ export default class UsuariosController{
         return res.status(500).json({ error: "ERROR AL LOGUEARSE" });
       }
     };
+    
+    getUserByUsername=async(req,res)=>{
+      const userName = req.params.username;
+      try {
+        const [result] = await pool.query("select nombre,biografia,fechaDeIngreso,ubicacion,sitioWeb,fotoPerfil,fotoBanner,nombreUsuario,verificado from usuarios where nombreUsuario = ?",[userName])
+
+        if(result.length<1){
+          res.status(404).json({error:"USUARIO NO EXISTENTE"})
+        }
+
+        res.status(200).json(result[0])
+
+      } catch (error) {
+        
+      }
+    }
 
     getMyUserData(req,res){
       const userData = req.user;
