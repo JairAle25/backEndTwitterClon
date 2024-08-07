@@ -15,7 +15,7 @@ app.use(cookieParser())
 app.use(express.urlencoded({ extended:true }))
 app.use(express.json({ type:"*/*" }))
 
-const allowedOrigins = ['http://localhost:3000'];
+const allowedOrigins = [env.get('HOST_SERVER').required().asString()];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
