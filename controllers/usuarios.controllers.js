@@ -129,4 +129,69 @@ export default class UsuariosController{
       res.status(200).json(userData)
     }
 
+    crearConsultaEditar(nombre, biografia, ubicacion, sitioWeb, fotoBanner, fotoPerfil,nombreUsuario){
+      let query = "update usuarios set ";
+      if(nombre){
+        query+=`nombre = '${nombre}',`
+      }
+      if(biografia){
+        query+=`biografia = '${biografia}',`
+      }
+      if(ubicacion){
+        query+=`ubicacion = '${ubicacion}',`
+      }
+      if(sitioWeb){
+        query+=`sitioWeb = '${sitioWeb}',`
+      }
+      if(fotoBanner){
+        query+=`fotoBanner = '${fotoBanner}',`
+      }
+      if(fotoPerfil){
+        query+=`fotoPerfil = '${fotoPerfil}',`
+      }
+      query=query.split("");
+      query.pop();
+      query = query.join("")
+      query+=` where nombreUsuario = '${nombreUsuario}'`
+      return query;
+    }
+
+    editProfile=async(req,res)=>{
+      const { nombre, biografia, ubicacion, sitioWeb, fotoBanner, fotoPerfil } = req.body;
+      const {nombreUsuario} = req.user;
+      let query = this.crearConsultaEditar(nombre,biografia,ubicacion,sitioWeb,fotoBanner,fotoPerfil,nombreUsuario);
+
+      try {
+        const result = await pool.query(query);
+        if(result[0].affectedRows<1){
+          return res.json({error:"NO SE PUDO MODIFICAR EL USUARIO"})
+        }
+
+        const [dataUser] = await pool.query("select nombre,biografia,fechaDeIngreso,ubicacion,sitioWeb,fotoPerfil,fotoBanner,nombreUsuario,verificado from usuarios where nombreUsuario = ?",[nombreUsuario])
+
+        if (dataUser.length === 0) {
+          return res.json({ error: "USUARIO NO ENCONTRADO" });
+        }
+
+        const user = dataUser[0];
+
+        const token = jwt.sign({
+          nombre:user.nombre,
+          biografia:user.biografia,
+          fechaDeIngreso:user.fechaDeIngreso,
+          ubicacion:user.ubicacion,
+          sitioWeb:user.sitioWeb,
+          fotoPerfil:user.fotoPerfil,
+          fotoBanner:user.fotoBanner,
+          nombreUsuario:user.nombreUsuario,
+          verificado:user.verificado
+        }, process.env.KEY_JWT, { expiresIn: '1h' });
+
+        res.cookie('access_token', token, { httpOnly: true, sameSite: 'Lax' });
+        res.status(200).json({ mensaje: "PERFIL ACTUALIZADO EXITOSAMENTE" });
+
+      } catch (error) {
+        return res.status(500).json({ error: "ERROR AL ACTUALIZAR PERFIL" });
+      }
+    }
 }

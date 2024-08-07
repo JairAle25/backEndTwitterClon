@@ -15,6 +15,7 @@ export default class UsuariosRoutes extends Routes{
             .get("/",this.usuariosC.getAllUsers)
             .get("/user/:username",this.usuariosC.getUserByUsername)
             .get("/myUser",authenticateToken,this.usuariosC.getMyUserData)
+            .put("/editarPerfil",authenticateToken,this.usuariosC.editProfile)
             .post("/register",this.usuariosC.createUser)
             .post("/login",this.usuariosC.login)
     }
