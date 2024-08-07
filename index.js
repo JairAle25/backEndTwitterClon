@@ -30,6 +30,20 @@ app.use(cors({
 
 
 const usuarios = new UsuariosRoutes();
+app.get("/",(req,res)=>{
+  const html = `
+  <html>
+    <head>
+    <title>PRUEBA</title>
+    </head>
+    <body>
+      <h1>FUNCIONA</h1>
+    </body>
+
+  </html>
+  `
+  res.send(html)
+})
 app.use("/usuarios",usuarios.router)
 
 app.listen(PORT,()=>{
