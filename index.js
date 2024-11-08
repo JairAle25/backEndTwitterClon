@@ -15,7 +15,7 @@ app.use(cookieParser())
 app.use(express.urlencoded({ extended:true }))
 app.use(express.json({ type:"*/*" }))
 
-const allowedOrigins = [env.get('HOST_SERVER').required().asString()];
+const allowedOrigins = ["http://localhost:3000"];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
@@ -30,20 +30,6 @@ app.use(cors({
 
 
 const usuarios = new UsuariosRoutes();
-app.get("/",(req,res)=>{
-  const html = `
-  <html>
-    <head>
-    <title>PRUEBA</title>
-    </head>
-    <body>
-      <h1>FUNCIONA</h1>
-    </body>
-
-  </html>
-  `
-  res.send(html)
-})
 app.use("/usuarios",usuarios.router)
 
 app.listen(PORT,()=>{

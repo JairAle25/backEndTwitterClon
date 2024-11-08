@@ -6,7 +6,7 @@ import { error } from 'console';
 
 export default class UsuariosController{
 
-     getAllUsers=async(req,res)=>{
+    getAllUsers=async(req,res)=>{
         try {
             const [results] = await pool.query("select * from usuarios")
             res.json(results);
